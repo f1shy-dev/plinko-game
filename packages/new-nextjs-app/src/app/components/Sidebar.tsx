@@ -3,15 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Select } from './ui/Select';
 import { autoBetIntervalMs, rowCountOptions } from '../constants/game';
-import {
-  balance,
-  betAmount,
-  betAmountOfExistingBalls,
-  plinkoEngine,
-  riskLevel,
-  rowCount,
-} from '../stores/game';
-import { isGameSettingsOpen, isLiveStatsOpen } from '../stores/layout';
+import { useGameStore } from '../stores/game';
+import { useLayoutStore } from '../stores/layout';
 import { BetMode, RiskLevel } from '../types/game';
 import { flyAndScale } from '../utils/transitions';
 import { Popover, Tooltip } from 'bits-ui';
@@ -21,6 +14,19 @@ import SettingsWindow from './SettingsWindow';
 import LiveStatsWindow from './LiveStatsWindow';
 
 const Sidebar: React.FC = () => {
+  const {
+    balance,
+    betAmount,
+    setBetAmount,
+    betAmountOfExistingBalls,
+    plinkoEngine,
+    riskLevel,
+    setRiskLevel,
+    rowCount,
+    setRowCount,
+  } = useGameStore();
+  const { isGameSettingsOpen, setIsGameSettingsOpen, isLiveStatsOpen, setIsLiveStatsOpen } = useLayoutStore();
+
   const [betMode, setBetMode] = useState<BetMode>(BetMode.MANUAL);
   const [autoBetInput, setAutoBetInput] = useState<number>(0);
   const [autoBetsLeft, setAutoBetsLeft] = useState<number | null>(null);
@@ -40,10 +46,10 @@ const Sidebar: React.FC = () => {
   const handleBetAmountFocusOut = (e: React.FocusEvent<HTMLInputElement>) => {
     const parsedValue = parseFloat(e.currentTarget.value.trim());
     if (isNaN(parsedValue)) {
-      betAmount = -1;
-      betAmount = 0;
+      setBetAmount(-1);
+      setBetAmount(0);
     } else {
-      betAmount = parsedValue;
+      setBetAmount(parsedValue);
     }
   };
 
@@ -153,7 +159,7 @@ const Sidebar: React.FC = () => {
           <button
             disabled={autoBetInterval !== null}
             onClick={() => {
-              betAmount = parseFloat((betAmount / 2).toFixed(2));
+              setBetAmount(parseFloat((betAmount / 2).toFixed(2)));
             }}
             className="touch-manipulation bg-slate-600 px-4 font-bold diagonal-fractions text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-slate-500 active:[&:not(:disabled)]:bg-slate-400"
           >
@@ -162,7 +168,7 @@ const Sidebar: React.FC = () => {
           <button
             disabled={autoBetInterval !== null}
             onClick={() => {
-              betAmount = parseFloat((betAmount * 2).toFixed(2));
+              setBetAmount(parseFloat((betAmount * 2).toFixed(2)));
             }}
             className="relative touch-manipulation rounded-r-md bg-slate-600 px-4 text-sm font-bold text-white transition-colors after:absolute after:left-0 after:inline-block after:h-1/2 after:w-[2px] after:bg-slate-800 after:content-[''] disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-slate-500 active:[&:not(:disabled)]:bg-slate-400"
           >
@@ -183,7 +189,7 @@ const Sidebar: React.FC = () => {
         <Select
           id="riskLevel"
           value={riskLevel}
-          onChange={(e) => riskLevel = e.target.value}
+          onChange={(e) => setRiskLevel(e.target.value)}
           items={riskLevels}
           disabled={hasOutstandingBalls || autoBetInterval !== null}
         />
@@ -196,7 +202,7 @@ const Sidebar: React.FC = () => {
         <Select
           id="rowCount"
           value={rowCount}
-          onChange={(e) => rowCount = e.target.value}
+          onChange={(e) => setRowCount(e.target.value)}
           items={rowCounts}
           disabled={hasOutstandingBalls || autoBetInterval !== null}
         />
@@ -261,7 +267,7 @@ const Sidebar: React.FC = () => {
           <Tooltip.Root openDelay={0} closeOnPointerDown={false}>
             <Tooltip.Trigger asChild>
               <button
-                onClick={() => isGameSettingsOpen.set(!isGameSettingsOpen)}
+                onClick={() => setIsGameSettingsOpen(!isGameSettingsOpen)}
                 className={twMerge(
                   'rounded-full p-2 text-slate-300 transition hover:bg-slate-600 active:bg-slate-500',
                   isGameSettingsOpen && 'text-slate-100',
@@ -283,7 +289,7 @@ const Sidebar: React.FC = () => {
           <Tooltip.Root openDelay={0} closeOnPointerDown={false}>
             <Tooltip.Trigger asChild>
               <button
-                onClick={() => isLiveStatsOpen.set(!isLiveStatsOpen)}
+                onClick={() => setIsLiveStatsOpen(!isLiveStatsOpen)}
                 className={twMerge(
                   'rounded-full p-2 text-slate-300 transition hover:bg-slate-600 active:bg-slate-500',
                   isLiveStatsOpen && 'text-slate-100',
