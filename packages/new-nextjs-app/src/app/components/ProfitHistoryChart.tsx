@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { totalProfitHistory } from '../stores/game';
 import { formatCurrency } from '../utils/numbers';

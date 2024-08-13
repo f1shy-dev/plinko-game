@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import { useStore } from 'react-redux';
 import { binColorsByRowCount } from '../../constants/game';

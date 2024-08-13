@@ -1,14 +1,22 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 
-interface SelectProps {
+interface SelectProps<T> {
   id: string;
-  value: string;
+  value: T;
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
-  items: { value: string; label: string }[];
+  items: { value: T; label: string }[];
   disabled?: boolean;
 }
 
-const Select: React.FC<SelectProps> = ({ id, value, onChange, items, disabled }) => {
+const Select = <T extends string | number>({
+  id,
+  value,
+  onChange,
+  items,
+  disabled,
+}: SelectProps<T>) => {
   const [selectValue, setSelectValue] = useState(value);
 
   useEffect(() => {
@@ -16,7 +24,7 @@ const Select: React.FC<SelectProps> = ({ id, value, onChange, items, disabled })
   }, [value]);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectValue(event.target.value);
+    setSelectValue(event.target.value as T);
     onChange(event);
   };
 

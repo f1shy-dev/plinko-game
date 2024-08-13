@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { winRecords } from '../stores/game';
 import { formatCurrency } from '../utils/numbers';

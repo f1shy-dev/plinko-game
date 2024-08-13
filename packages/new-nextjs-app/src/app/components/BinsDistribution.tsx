@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { Chart } from 'chart.js/auto';
 import { binPayouts, binProbabilitiesByRowCount, RowCount, RiskLevel } from '../constants/game';

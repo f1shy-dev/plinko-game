@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef, useState } from 'react';
 import CircleNotch from 'phosphor-react/lib/CircleNotch';
 import BinsRow from './BinsRow';

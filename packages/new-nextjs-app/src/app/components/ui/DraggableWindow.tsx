@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useRef } from 'react';
 import { DraggableCore } from 'react-draggable';
 import { X } from 'phosphor-react';

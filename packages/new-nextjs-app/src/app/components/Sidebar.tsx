@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { Select } from './ui/Select';
 import { autoBetIntervalMs, rowCountOptions } from '../constants/game';

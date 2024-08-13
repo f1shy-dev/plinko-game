@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { totalProfitHistory, winRecords } from '../stores/game';
 import { isLiveStatsOpen } from '../stores/layout';
