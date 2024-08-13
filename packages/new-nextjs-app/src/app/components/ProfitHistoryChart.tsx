@@ -1,42 +1,37 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { totalProfitHistory } from '../stores/game';
+import React, { useState } from 'react';
+import { useGameStore } from '../stores/game';
 import { formatCurrency } from '../utils/numbers';
-import { Chart, Line } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import { twMerge } from 'tailwind-merge';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ChartOptions } from 'chart.js';
 
-const WIN_COLOR = 'rgb(74, 222, 128)'; // green-400
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+
+const WIN_COLOR = 'rgb(74, 222, 128)';
 const WIN_COLOR_FILL = 'rgba(74, 222, 128, 0.3)';
-const LOSS_COLOR = 'rgb(248, 113, 113)'; // red-400
-const LOSS_COLOR_FILL = 'rgba(248, 113, 113, 0.3)'; // red-400
-const X_AXIS_COLOR = '#1e293b'; // slate-800
+const LOSS_COLOR = 'rgb(248, 113, 113)';
+const LOSS_COLOR_FILL = 'rgba(248, 113, 113, 0.3)';
+const X_AXIS_COLOR = '#1e293b';
 const POINT_HOVER_COLOR = '#fff';
 
 const ProfitHistoryChart: React.FC = () => {
-  const [profitHistory, setProfitHistory] = useState<number[]>([]);
+  const { totalProfitHistory } = useGameStore();
   const [hoveredProfitValue, setHoveredProfitValue] = useState<number | null>(null);
 
-  useEffect(() => {
-    const unsubscribeProfitHistory = totalProfitHistory.subscribe(setProfitHistory);
-
-    return () => {
-      unsubscribeProfitHistory();
-    };
-  }, []);
-
   const data = {
-    labels: Array(profitHistory.length).fill(0), // Label does not matter
+    labels: Array(totalProfitHistory.length).fill(0),
     datasets: [
       {
         label: 'Profit',
-        data: profitHistory,
+        data: totalProfitHistory,
         fill: {
           target: 'origin',
           above: WIN_COLOR_FILL,
           below: LOSS_COLOR_FILL,
         },
-        cubicInterpolationMode: 'monotone',
+        cubicInterpolationMode: 'monotone' as const,
         segment: {
           borderColor: (ctx: any) => {
             const y0 = ctx.p0.parsed.y;
@@ -55,17 +50,15 @@ const ProfitHistoryChart: React.FC = () => {
     ],
   };
 
-  const options = {
+  const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
-    animations: {
-      y: {
-        duration: 0, // Disable weird y-value jumping animation
-      },
+    animation: {
+      duration: 0,
     },
     interaction: {
       intersect: false,
-      mode: 'index', // Easily "hover" points when move mouse across x-axis
+      mode: 'index',
     },
     plugins: {
       legend: { display: false },
@@ -73,24 +66,22 @@ const ProfitHistoryChart: React.FC = () => {
     },
     scales: {
       x: {
-        border: { display: false },
-        grid: { display: false },
-        ticks: { display: false },
+        display: false,
       },
       y: {
         border: { display: false },
         grid: {
-          color: (ctx: any) => (ctx.tick.value === 0 ? X_AXIS_COLOR : undefined),
+          color: (ctx) => (ctx.tick.value === 0 ? X_AXIS_COLOR : undefined),
           lineWidth: 2,
         },
         ticks: { display: false },
         grace: '1%',
       },
     },
-    onHover: (_: any, elements: any) => {
+    onHover: (_, elements) => {
       if (elements.length) {
         const selectedPointIndex = elements[0].index;
-        setHoveredProfitValue(profitHistory[selectedPointIndex]);
+        setHoveredProfitValue(totalProfitHistory[selectedPointIndex]);
       }
     },
   };

@@ -1,18 +1,21 @@
-import { useState, useEffect } from 'react';
-import { binColor, binPayouts, binProbabilitiesByRowCount, RowCount, RiskLevel } from '../constants/game';
-import { countValueOccurrences, dotProduct } from '../utils/numbers';
+import { useState, useEffect, useCallback } from 'react';
+import { binColor, binPayouts, binProbabilitiesByRowCount, type RowCount } from '@/app/constants/game';
+import { RiskLevel, type BetAmountOfExistingBalls, type WinRecord } from '@/app/types/game';
+import { countValueOccurrences } from '@/app/utils/numbers';
+import { interpolateRgbColors } from '../constants/colors';
+import type PlinkoEngine from '../components/Plinko/PlinkoEngine';
 
 export const useGameStore = () => {
-  const [plinkoEngine, setPlinkoEngine] = useState(null);
-  const [betAmount, setBetAmount] = useState(1);
-  const [betAmountOfExistingBalls, setBetAmountOfExistingBalls] = useState({});
+  const [plinkoEngine, setPlinkoEngine] = useState<PlinkoEngine | null>(null);
+  const [betAmount, setBetAmount] = useState<number>(1);
+  const [betAmountOfExistingBalls, setBetAmountOfExistingBalls] = useState<BetAmountOfExistingBalls>({});
   const [rowCount, setRowCount] = useState<RowCount>(16);
   const [riskLevel, setRiskLevel] = useState<RiskLevel>(RiskLevel.MEDIUM);
-  const [winRecords, setWinRecords] = useState([]);
-  const [totalProfitHistory, setTotalProfitHistory] = useState([0]);
-  const [balance, setBalance] = useState(200);
-  const [binColors, setBinColors] = useState({ background: [], shadow: [] });
-  const [binProbabilities, setBinProbabilities] = useState({});
+  const [winRecords, setWinRecords] = useState<WinRecord[]>([]);
+  const [totalProfitHistory, setTotalProfitHistory] = useState<number[]>([0]);
+  const [balance, setBalance] = useState<number>(200);
+  const [binColors, setBinColors] = useState<{ background: string[], shadow: string[] }>({ background: [], shadow: [] });
+  const [binProbabilities, setBinProbabilities] = useState<Record<number, number>>({});
 
   useEffect(() => {
     const binCount = rowCount + 1;
@@ -39,12 +42,24 @@ export const useGameStore = () => {
 
   useEffect(() => {
     const occurrences = countValueOccurrences(winRecords.map(({ binIndex }) => binIndex));
-    const probabilities = {};
+    const probabilities: Record<number, number> = {};
     for (let i = 0; i < rowCount + 1; ++i) {
       probabilities[i] = occurrences[i] / winRecords.length || 0;
     }
     setBinProbabilities(probabilities);
   }, [winRecords, rowCount]);
+
+  const addWinRecord = useCallback((winRecord: WinRecord) => {
+    setWinRecords((prevRecords) => [...prevRecords, winRecord]);
+    setTotalProfitHistory((prevHistory) => {
+      const lastTotalProfit = prevHistory[prevHistory.length - 1];
+      return [...prevHistory, lastTotalProfit + winRecord.profit];
+    });
+  }, []);
+
+  const updateBalance = useCallback((amount: number) => {
+    setBalance((prevBalance) => prevBalance + amount);
+  }, []);
 
   return {
     plinkoEngine,
@@ -59,10 +74,12 @@ export const useGameStore = () => {
     setRiskLevel,
     winRecords,
     setWinRecords,
+    addWinRecord,
     totalProfitHistory,
     setTotalProfitHistory,
     balance,
     setBalance,
+    updateBalance,
     binColors,
     binProbabilities,
   };

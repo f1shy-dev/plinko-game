@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Chart } from 'chart.js/auto';
-import { binPayouts, binProbabilitiesByRowCount, RowCount, RiskLevel } from '../constants/game';
-import { dotProduct } from '../utils/numbers';
+import { binPayouts, binProbabilitiesByRowCount, RowCount } from '@/app/constants/game';
+import { RiskLevel } from '@/app/types/game';
+import { dotProduct } from '@/app/utils/numbers';
 
 const BinsDistribution: React.FC = () => {
   const [binProbabilities, setBinProbabilities] = useState<{ [binIndex: number]: number }>({});

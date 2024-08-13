@@ -2,13 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Select } from './ui/Select';
-import { autoBetIntervalMs, rowCountOptions } from '../constants/game';
+import { autoBetIntervalMs, RowCount, rowCountOptions } from '../constants/game';
 import { useGameStore } from '../stores/game';
-// import { useLayoutStore } from '../stores/layout';
-
 import { BetMode, RiskLevel } from '../types/game';
-import { flyAndScale } from '../utils/transitions';
-import { Popover, Tooltip } from 'bits-ui';
+import * as Tooltip from '@radix-ui/react-tooltip';
+import * as Popover from '@radix-ui/react-popover';
 import { ChartLine, GearSix, Infinity as InfinityIcon, Question } from 'phosphor-react';
 import { twMerge } from 'tailwind-merge';
 import SettingsWindow from './SettingsWindow';
@@ -46,8 +44,8 @@ const Sidebar: React.FC = () => {
   const hasOutstandingBalls = Object.keys(betAmountOfExistingBalls).length > 0;
 
   const handleBetAmountFocusOut = (e: React.FocusEvent<HTMLInputElement>) => {
-    const parsedValue = parseFloat(e.currentTarget.value.trim());
-    if (isNaN(parsedValue)) {
+    const parsedValue = Number.parseFloat(e.currentTarget.value.trim());
+    if (Number.isNaN(parsedValue)) {
       setBetAmount(-1);
       setBetAmount(0);
     } else {
@@ -84,8 +82,8 @@ const Sidebar: React.FC = () => {
   };
 
   const handleAutoBetInputFocusOut = (e: React.FocusEvent<HTMLInputElement>) => {
-    const parsedValue = parseInt(e.currentTarget.value.trim());
-    if (isNaN(parsedValue)) {
+    const parsedValue = Number.parseInt(e.currentTarget.value.trim(), 10);
+    if (Number.isNaN(parsedValue)) {
       setAutoBetInput(-1);
       setAutoBetInput(0);
     } else {
@@ -127,6 +125,7 @@ const Sidebar: React.FC = () => {
               'flex-1 rounded-full py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-slate-600 active:[&:not(:disabled)]:bg-slate-500',
               betMode === value && 'bg-slate-600',
             )}
+            type="button"
           >
             {label}
           </button>
@@ -142,7 +141,7 @@ const Sidebar: React.FC = () => {
             <input
               id="betAmount"
               value={betAmount}
-              onFocusOut={handleBetAmountFocusOut}
+              onBlur={handleBetAmountFocusOut}
               disabled={autoBetInterval !== null}
               type="number"
               min="0"
@@ -161,18 +160,20 @@ const Sidebar: React.FC = () => {
           <button
             disabled={autoBetInterval !== null}
             onClick={() => {
-              setBetAmount(parseFloat((betAmount / 2).toFixed(2)));
+              setBetAmount(Number.parseFloat((betAmount / 2).toFixed(2)));
             }}
             className="touch-manipulation bg-slate-600 px-4 font-bold diagonal-fractions text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-slate-500 active:[&:not(:disabled)]:bg-slate-400"
+            type="button"
           >
             1/2
           </button>
           <button
             disabled={autoBetInterval !== null}
             onClick={() => {
-              setBetAmount(parseFloat((betAmount * 2).toFixed(2)));
+              setBetAmount(Number.parseFloat((betAmount * 2).toFixed(2)));
             }}
             className="relative touch-manipulation rounded-r-md bg-slate-600 px-4 text-sm font-bold text-white transition-colors after:absolute after:left-0 after:inline-block after:h-1/2 after:w-[2px] after:bg-slate-800 after:content-[''] disabled:cursor-not-allowed disabled:opacity-50 hover:[&:not(:disabled)]:bg-slate-500 active:[&:not(:disabled)]:bg-slate-400"
+            type="button"
           >
             2×
           </button>
@@ -180,7 +181,7 @@ const Sidebar: React.FC = () => {
         {isBetAmountNegative ? (
           <p className="absolute text-xs leading-5 text-red-400">This must be greater than or equal to 0.</p>
         ) : isBetExceedBalance ? (
-          <p className="absolute text-xs leading-5 text-red-400">Can't bet more than your balance!</p>
+          <p className="absolute text-xs leading-5 text-red-400">Can&apos;t bet more than your balance!</p>
         ) : null}
       </div>
 
@@ -191,7 +192,7 @@ const Sidebar: React.FC = () => {
         <Select
           id="riskLevel"
           value={riskLevel}
-          onChange={(e) => setRiskLevel(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setRiskLevel(e.target.value as RiskLevel)}
           items={riskLevels}
           disabled={hasOutstandingBalls || autoBetInterval !== null}
         />
@@ -204,7 +205,7 @@ const Sidebar: React.FC = () => {
         <Select
           id="rowCount"
           value={rowCount}
-          onChange={(e) => setRowCount(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setRowCount(Number(e.target.value) as RowCount)}
           items={rowCounts}
           disabled={hasOutstandingBalls || autoBetInterval !== null}
         />
@@ -217,16 +218,20 @@ const Sidebar: React.FC = () => {
               Number of Bets
             </label>
             <Popover.Root>
-              <Popover.Trigger className="p-1">
-                <Question className="text-slate-300" weight="bold" />
+              <Popover.Trigger asChild>
+                <button className="p-1" type="button">
+                  <Question className="text-slate-300" weight="bold" />
+                </button>
               </Popover.Trigger>
-              <Popover.Content
-                transition={flyAndScale}
-                className="z-30 max-w-lg p-3 text-sm font-medium bg-white rounded-md text-gray-950 drop-shadow-xl"
-              >
-                <p>Enter '0' for unlimited bets.</p>
-                <Popover.Arrow />
-              </Popover.Content>
+              <Popover.Portal>
+                <Popover.Content
+                  className="z-30 max-w-lg p-3 text-sm font-medium bg-white rounded-md text-gray-950 drop-shadow-xl"
+                  sideOffset={5}
+                >
+                  <p>Enter &apos;0&apos; for unlimited bets.</p>
+                  <Popover.Arrow className="fill-white" />
+                </Popover.Content>
+              </Popover.Portal>
             </Popover.Root>
           </div>
           <div className="relative">
@@ -234,7 +239,7 @@ const Sidebar: React.FC = () => {
               id="autoBetInput"
               value={autoBetInterval === null ? autoBetInput : autoBetsLeft ?? 0}
               disabled={autoBetInterval !== null}
-              onFocusOut={handleAutoBetInputFocusOut}
+              onBlur={handleAutoBetInputFocusOut}
               type="number"
               min="0"
               inputMode="numeric"
@@ -260,55 +265,64 @@ const Sidebar: React.FC = () => {
           'touch-manipulation rounded-md bg-green-500 py-3 font-semibold text-slate-900 transition-colors hover:bg-green-400 active:bg-green-600 disabled:bg-neutral-600 disabled:text-neutral-400',
           autoBetInterval !== null && 'bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600',
         )}
+        type="button"
       >
         {betMode === BetMode.MANUAL ? 'Drop Ball' : autoBetInterval === null ? 'Start Autobet' : 'Stop Autobet'}
       </button>
 
       <div className="pt-5 mt-auto">
         <div className="flex items-center gap-4 pt-3 border-t border-slate-600">
-          <Tooltip.Root openDelay={0} closeOnPointerDown={false}>
-            <Tooltip.Trigger asChild>
-              <button
-                onClick={() => setIsGameSettingsOpen(!isGameSettingsOpen)}
-                className={twMerge(
-                  'rounded-full p-2 text-slate-300 transition hover:bg-slate-600 active:bg-slate-500',
-                  isGameSettingsOpen && 'text-slate-100',
-                )}
-              >
-                <GearSix className="size-6" weight="fill" />
-              </button>
-            </Tooltip.Trigger>
-            <Tooltip.Content
-              transition={flyAndScale}
-              sideOffset={4}
-              className="z-30 max-w-lg p-3 text-sm font-medium bg-white rounded-md text-gray-950 drop-shadow-xl"
-            >
-              <Tooltip.Arrow />
-              <p>{isGameSettingsOpen ? 'Close' : 'Open'} Game Settings</p>
-            </Tooltip.Content>
-          </Tooltip.Root>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <button
+                  onClick={() => setIsGameSettingsOpen(!isGameSettingsOpen)}
+                  className={twMerge(
+                    'rounded-full p-2 text-slate-300 transition hover:bg-slate-600 active:bg-slate-500',
+                    isGameSettingsOpen && 'text-slate-100',
+                  )}
+                  type="button"
+                >
+                  <GearSix className="size-6" weight="fill" />
+                </button>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  className="z-30 max-w-lg p-3 text-sm font-medium bg-white rounded-md text-gray-950 drop-shadow-xl"
+                  sideOffset={5}
+                >
+                  <p>{isGameSettingsOpen ? 'Close' : 'Open'} Game Settings</p>
+                  <Tooltip.Arrow className="fill-white" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
 
-          <Tooltip.Root openDelay={0} closeOnPointerDown={false}>
-            <Tooltip.Trigger asChild>
-              <button
-                onClick={() => setIsLiveStatsOpen(!isLiveStatsOpen)}
-                className={twMerge(
-                  'rounded-full p-2 text-slate-300 transition hover:bg-slate-600 active:bg-slate-500',
-                  isLiveStatsOpen && 'text-slate-100',
-                )}
-              >
-                <ChartLine className="size-6" weight="bold" />
-              </button>
-            </Tooltip.Trigger>
-            <Tooltip.Content
-              transition={flyAndScale}
-              sideOffset={4}
-              className="z-30 max-w-lg p-3 text-sm font-medium bg-white rounded-md text-gray-950 drop-shadow-xl"
-            >
-              <Tooltip.Arrow />
-              <p>{isLiveStatsOpen ? 'Close' : 'Open'} Live Stats</p>
-            </Tooltip.Content>
-          </Tooltip.Root>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <button
+                  onClick={() => setIsLiveStatsOpen(!isLiveStatsOpen)}
+                  className={twMerge(
+                    'rounded-full p-2 text-slate-300 transition hover:bg-slate-600 active:bg-slate-500',
+                    isLiveStatsOpen && 'text-slate-100',
+                  )}
+                  type="button"
+                >
+                  <ChartLine className="size-6" weight="bold" />
+                </button>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  className="z-30 max-w-lg p-3 text-sm font-medium bg-white rounded-md text-gray-950 drop-shadow-xl"
+                  sideOffset={5}
+                >
+                  <p>{isLiveStatsOpen ? 'Close' : 'Open'} Live Stats</p>
+                  <Tooltip.Arrow className="fill-white" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </div>
       </div>
 

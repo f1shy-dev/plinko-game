@@ -1,5 +1,4 @@
-import type { RowCount } from '../constants/game';
-export type { RowCount } from '../constants/game';
+import { RowCount } from '../constants/game';
 
 export enum BetMode {
   MANUAL = 'MANUAL',

@@ -1,3 +1,6 @@
+type RgbColor = { r: number; g: number; b: number };
+import type { RowCount } from '@/app/constants/game';
+
 /**
  * Creates a gradient of RGB colors of length `length`.
  *
