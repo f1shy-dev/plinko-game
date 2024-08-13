@@ -5,7 +5,7 @@ import { isGameSettingsOpen } from '../stores/layout';
 import { isAnimationOn } from '../stores/settings';
 import { hasPreferReducedMotion } from '../utils/settings';
 import { Label } from 'bits-ui';
-import GearSix from 'phosphor-react/lib/GearSix';
+import { GearSix } from 'phosphor-react';
 import DraggableWindow from './ui/DraggableWindow';
 import Switch from './ui/Switch';
 
