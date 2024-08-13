@@ -4,14 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { Select } from './ui/Select';
 import { autoBetIntervalMs, rowCountOptions } from '../constants/game';
 import { useGameStore } from '../stores/game';
-import { useLayoutStore } from '../stores/layout';
+// import { useLayoutStore } from '../stores/layout';
+
 import { BetMode, RiskLevel } from '../types/game';
 import { flyAndScale } from '../utils/transitions';
 import { Popover, Tooltip } from 'bits-ui';
-import { ChartLine, GearSix, Infinity, Question } from 'phosphor-react';
+import { ChartLine, GearSix, Infinity as InfinityIcon, Question } from 'phosphor-react';
 import { twMerge } from 'tailwind-merge';
 import SettingsWindow from './SettingsWindow';
 import LiveStatsWindow from './LiveStatsWindow';
+import useLayoutStore from '../stores/layout';
 
 const Sidebar: React.FC = () => {
   const {
@@ -114,8 +116,8 @@ const Sidebar: React.FC = () => {
   const rowCounts = rowCountOptions.map((value) => ({ value, label: value.toString() }));
 
   return (
-    <div className="flex flex-col gap-5 bg-slate-700 p-3 lg:max-w-80">
-      <div className="flex gap-1 rounded-full bg-slate-900 p-1">
+    <div className="flex flex-col gap-5 p-3 bg-slate-700 lg:max-w-80">
+      <div className="flex gap-1 p-1 rounded-full bg-slate-900">
         {betModes.map(({ value, label }) => (
           <button
             key={value}
@@ -152,7 +154,7 @@ const Sidebar: React.FC = () => {
                   'border-red-500 focus:border-red-400 hover:[&:not(:disabled)]:border-red-400',
               )}
             />
-            <div className="absolute left-3 top-2 select-none text-slate-500" aria-hidden>
+            <div className="absolute select-none left-3 top-2 text-slate-500" aria-hidden>
               $
             </div>
           </div>
@@ -220,7 +222,7 @@ const Sidebar: React.FC = () => {
               </Popover.Trigger>
               <Popover.Content
                 transition={flyAndScale}
-                className="z-30 max-w-lg rounded-md bg-white p-3 text-sm font-medium text-gray-950 drop-shadow-xl"
+                className="z-30 max-w-lg p-3 text-sm font-medium bg-white rounded-md text-gray-950 drop-shadow-xl"
               >
                 <p>Enter '0' for unlimited bets.</p>
                 <Popover.Arrow />
@@ -242,7 +244,7 @@ const Sidebar: React.FC = () => {
               )}
             />
             {autoBetInput === 0 && (
-              <Infinity className="absolute right-3 top-3 size-4 text-slate-400" weight="bold" />
+              <InfinityIcon className="absolute right-3 top-3 size-4 text-slate-400" weight="bold" />
             )}
           </div>
           {isAutoBetInputNegative && (
@@ -262,8 +264,8 @@ const Sidebar: React.FC = () => {
         {betMode === BetMode.MANUAL ? 'Drop Ball' : autoBetInterval === null ? 'Start Autobet' : 'Stop Autobet'}
       </button>
 
-      <div className="mt-auto pt-5">
-        <div className="flex items-center gap-4 border-t border-slate-600 pt-3">
+      <div className="pt-5 mt-auto">
+        <div className="flex items-center gap-4 pt-3 border-t border-slate-600">
           <Tooltip.Root openDelay={0} closeOnPointerDown={false}>
             <Tooltip.Trigger asChild>
               <button
@@ -279,7 +281,7 @@ const Sidebar: React.FC = () => {
             <Tooltip.Content
               transition={flyAndScale}
               sideOffset={4}
-              className="z-30 max-w-lg rounded-md bg-white p-3 text-sm font-medium text-gray-950 drop-shadow-xl"
+              className="z-30 max-w-lg p-3 text-sm font-medium bg-white rounded-md text-gray-950 drop-shadow-xl"
             >
               <Tooltip.Arrow />
               <p>{isGameSettingsOpen ? 'Close' : 'Open'} Game Settings</p>
@@ -301,7 +303,7 @@ const Sidebar: React.FC = () => {
             <Tooltip.Content
               transition={flyAndScale}
               sideOffset={4}
-              className="z-30 max-w-lg rounded-md bg-white p-3 text-sm font-medium text-gray-950 drop-shadow-xl"
+              className="z-30 max-w-lg p-3 text-sm font-medium bg-white rounded-md text-gray-950 drop-shadow-xl"
             >
               <Tooltip.Arrow />
               <p>{isLiveStatsOpen ? 'Close' : 'Open'} Live Stats</p>
