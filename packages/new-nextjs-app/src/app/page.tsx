@@ -1,4 +1,8 @@
-import Image from "next/image";
+import React from 'react';
+import Sidebar from './components/Sidebar';
+import Plinko from './components/Plinko/Plinko';
+import Balance from './components/Balance';
+import BinsDistribution from './components/BinsDistribution';
 
 export default function Home() {
   return (
@@ -108,6 +112,11 @@ export default function Home() {
           </p>
         </a>
       </div>
+
+      <Sidebar />
+      <Plinko />
+      <Balance />
+      <BinsDistribution />
     </main>
   );
 }
