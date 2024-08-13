@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import CircleNotch from 'phosphor-react/lib/CircleNotch';
+import { CircleNotch } from 'phosphor-react';
 import BinsRow from './BinsRow';
 import LastWins from './LastWins';
 import PlinkoEngine from './PlinkoEngine';

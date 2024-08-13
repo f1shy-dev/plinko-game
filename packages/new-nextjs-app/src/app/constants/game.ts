@@ -1,5 +1,5 @@
 import { RiskLevel } from '../types/game';
-import { getBinColors } from '../utils/colors';
+import { getBinColors } from './colors';
 import { computeBinProbabilities } from '../utils/numbers';
 
 export const LOCAL_STORAGE_KEY = {
